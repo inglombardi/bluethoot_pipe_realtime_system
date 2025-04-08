@@ -211,3 +211,179 @@ gcc -o aoa_to_1d aoa_to_1d.c
 should be sufficient to correctly compile the file aoa_to_1d.c. However, in this case, it is necessary to add the -lm flag to link the math library (libm), and here is why "  gcc -o aoa_to_1d aoa_to_1d.c -lm  " is correct and mandatory!
 
 
+
+## C language pills
+
+In C, you can operate on files only in terms of sequences
+of bytes: stream
+There are no high-level functions like in other languages ​​such as Python that mimics the write() and read() of C.
+In the C code of the project we use pointers.
+
+To read and write to files, a pointer to a derived type is used
+FILE *fileptr; //pointer to the file
+
+This procedure is identical whether you use a file or a pipe.
+
+
+(1) Example of pipe:
+
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>//for open()
+#include <string.h> //for sprintf() : the output is a string
+#include <sys/stat.h>
+
+int main(){
+	int x;
+	int fd_pipe[2];//one for reading and one for writing
+	char str[100];
+	
+	pipe(fd_pipe);//creating of communication channel in the parent channel
+	printf("Please type an integer number: ");
+	scanf("%d",&x);
+
+	switch(fork()){
+		case 0:
+			//Parent's fd inheritance
+			close(fd_pipe[0]);//because it has to write
+			sprintf(str,"[CHILD] The new number is %d\n",x+5);
+			write(fd_pipe[1],str,strlen(str));
+			
+			return 0;
+		default:
+			close(fd_pipe[1]);//because it has to read
+			read(fd_pipe[0],str,sizeof(str));//I dont need to loop
+			printf("[PARENT] The Child says: %s\n",str);
+	}
+}
+
+Parent		    ___________________________________________________ Child
+  fd[1]--->read ---------------------------------------------------fd[1]--->write
+  fd[0]--->write---------------------------------------------------fd[0]--->read          
+		         ___________________________________________________
+
+
+(2) Another example of pipe: my script oao_to_1d.c
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+#define MAX_LINE_LENGTH 256
+
+int main(int argc, char *argv[]) {
+    if (argc != 4) {
+        fprintf(stderr, "Usage: %s <input_pipe> <output_pipe> <h_anchor>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+    const char *input_pipe = argv[1];
+    const char *output_pipe = argv[2];
+    double h_anchor = atof(argv[3]);
+
+    FILE *input_fp = fopen(input_pipe, "r");
+    if (!input_fp) {
+        perror("Error opening input pipe");
+        return EXIT_FAILURE;
+    }
+
+    FILE *output_fp = fopen(output_pipe, "w");
+    if (!output_fp) {
+        perror("Error opening output pipe");
+        fclose(input_fp);
+        return EXIT_FAILURE;
+    }
+
+    char line[MAX_LINE_LENGTH];
+    while (fgets(line, sizeof(line), input_fp)) {
+        unsigned long long timestamp;
+        char tag_id[17];
+        double angle, h_tag, x;
+        
+        if (sscanf(line, "%llu,%16[^,],%lf,%lf", &timestamp, tag_id, &angle, &h_tag) != 4) {
+            fprintf(stderr, "Error parsing line: %s", line);
+            continue;
+        }
+
+        double alpha_rad = angle * M_PI / 180.0;
+        x = (h_anchor - h_tag) * tan(alpha_rad);
+
+        fprintf(output_fp, "%llu,%s,%.2f\n", timestamp, tag_id, x);
+        fflush(output_fp);
+    }
+
+    fclose(input_fp);
+    fclose(output_fp);
+    return EXIT_SUCCESS;
+}
+
+
+In C you can operate on files only in terms of sequences
+of bytes: stream
+There are no high-level functions like in other languages ​​such as Python that mimics the write() and read() of C.
+In the C code of the project we use pointers.
+
+To read and write to files we use a pointer to a derived type
+FILE *fileptr; //pointer to the file
+
+This procedure is identical whether you use a file or a pipe.
+
+✅ Script 2: aoa_to_1d.c
+📌 Features: It uses named pipes (FIFO), i.e. special files in the filesystem.
+
+The program takes the names of the pipes as command line arguments.
+
+It communicates between separate processes (not necessarily parent-child) via FIFO files created before running the script.
+
+🔍 How it works:
+
+FILE *input_fp = fopen(input_pipe, "r");
+FILE *output_fp = fopen(output_pipe, "w");
+These pipes must already exist, for example created with:
+
+mkfifo pipe_input
+mkfifo pipe_output
+
+
+The process reads from one pipe (input_pipe) and writes the processing to another (output_pipe).
+
+There is no fork() in the code → the processes involved are launched separately but communicate with each other via these special files.
+
+🧠 Key concept:
+Persistent inter-process communication, based on FIFO files in the filesystem.
+
+✅ Script 1: pipe.c
+📌 Features:
+Uses unnamed pipes, i.e. anonymous pipes created with pipe(fd_pipe).
+
+It works internally between a parent process and its child process created with fork().
+
+It is all autonomous, no files in the filesystem.
+
+🔍 How it works:
+
+pipe(fd_pipe);
+fork();
+
+Child writes to pipe (fd_pipe[1])
+
+Father reads from pipe (fd_pipe[0])
+
+Data (integer plus 5) is passed directly into shared memory via pipe.
+
+🧠 Key concept:
+Parent-child communication based on anonymous pipes in RAM. It is temporary and limited to the lifetime of the process.
+
+🔄 Differences summary:
+Feature                        aoa_to_1d.c   (2)            pipe.c  (1)
+Pipe type                      Named pipe (FIFO)             Unnamed pipe (anonymous pipe)
+Communication                  between separate processes    Parent process ↔ child (fork)
+Pipe creation                  Externally with mkfifo        Internally with pipe()
+I/O mechanism                  fopen(), fprintf(), fgets()   read(), write()
+
+Persistence Can persist in filesystem, Temporary, exists only in RAM
+
+
+
+
