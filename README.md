@@ -23,13 +23,50 @@ The cow transmits Bluetooth packets through a tag; a fixed anchor receives these
 The workflow is composed by 5 phases:
 1. Creates Linux named pipes, to facilitate communication between the 
 components. 
-2. Starts the aoa_to_1d and median_filter.py processes, ensuring they read 
-from and write to the correct pipes. 
-3. Reads input data from input.csv, writes it to the aoa_to_1d input pipe, and 
+2. Starts the Preprocessing with aoa_to_1d and median_filter.py processes, ensuring they read 
+from and write to the correct pipes.
+aoa_to_1d.c receives pipes from Python script (pipeline.py) that is the called by test_pipe.
+
+aoa_to_1d: A C program that converts the angle to a 1D position.
+
+median_filter.py: A Python script that filters the data using the median.
+
+4. Reads input data from input.csv, writes it to the aoa_to_1d input pipe, and 
 ensures the process is properly notified when input is finished. 
-4. Reads the final filtered output from median_filter.py and writes it to an 
+5. Reads the final filtered output from median_filter.py and writes it to an 
 output CSV file (output.csv). 
-5. Handles process cleanup and removes the named pipes after execution.
+6. Handles process cleanup and removes the named pipes after execution.
+
+
+## Work planning to follow (not the runtime but the code writing before testing)
+
+1. Creating named pipes (FIFO)  [Python]
+
+Create 2 pipes: one for aoa_to_1d and one for median_filter.py.
+
+2. Starting processes with Python
+Compile and run aoa_to_1d. [C language with GCC using Ubuntu shell with WSL]
+
+Start median_filter.py with its parameters.
+
+3. Data flow management
+
+Read data from input.csv.
+Write it to the aoa_to_1d pipe.
+Read the output of aoa_to_1d and pass it to the median_filter.py pipe.
+Write the final result to output.csv.
+
+4. Shutdown and cleanup
+
+Shut down all files and processes.
+
+Delete named pipes.
+
+5. Test
+
+Write a test plan with several cases to cover.
+Implement at least one automated test.
+
 
 
 
@@ -55,8 +92,159 @@ Each row in `input.csv` contains a timestamped angle measurement:
 timestamp,tag_id,angle,tag_height 1733062840000,4baf351178aa9b0e,-30,1.2
 
 
+# TEST PLAN 
 
-## How to Run
+__________
+Test phase
+__________
+
+Write a test plan with various cases to cover.
+Implement at least one automatic test: the one I choose is y(x) = x case then OUTPUT == EXPECTED ???
+
+Test Plan for pipeline.py using test_pipe.py as CALLER
+
+********************************************************************************************
+1. Test Named Pipes Creation [Setup test]
+
+TASK: Verify that all named pipes are created correctly before running the program.
+
+Success Criteria: After pipeline.py is started, the files input_pipe.fifo, output_pipe_aoa.fifo
+and output_pipe_filter.fifo must exist 3/3
+
+********************************************************************************************
+
+********************************************************************************************
+2. Process Startup Test
+
+TASK: Check that aoa_to_1d and median_filter.py are started correctly.
+
+==> first run gcc -o aoa_to_1d aoa_to_1d.c -lm
+like:
+gcc -c script.c
+gcc -o exe script.c
+
+fix the "bug": I consulted the linux documentation
+
+/usr/bin/ld: /tmp/cca4wrEa.o: in function `main':
+aoa_to_1d.c:(.text+0x202): undefined reference to `tan'
+collect2: error: ld returned 1 exit status
+********************************************************************************************
+
+I have set the "Success Criterion" for both processes that must be active in the system after the execution of pipeline.py.
+i.e. processes Pi and Pj are exactly aoa_to_1d.c and median_filter.py
+
+
+
+
+__________________________________________________________________________________________________________________________________________
+TC 1: Read and Write Tests on Named Pipes that gave me problems and therefore you should implement on files
+____________________________________________________________________________________________________________________________________________
+
+TASK: Verify that data flows correctly between named pipes.
+
+Success Criterion: Data written to input_pipe.fifo must be correctly read by aoa_to_1d, and
+the results must be correctly transferred to median_filter.py.
+
+_________________________________________
+TC 2: Data Processing Tests
+_________________________________________
+
+TASK: Verify that aoa_to_1d correctly calculates the position and that median_filter.py correctly applies the median filter.
+
+In the Dataframe test I found: (example with df.head(5) )
+
+Input DataFrame:
+ timestamp tag_id angle tag_height
+0 1733062840000 4baf351178aa9b0e -30 1.2
+1 1733062840100 4baf351178aa9b0e -28 1.2
+2 1733062840200 4baf351178aa9b0e -39 1.2
+3 1733062840300 4baf351178aa9b0e -27 1.2
+4 1733062840400 4baf351178aa9b0e -4 1.2
+
+ ########################################
+
+ Test Number 1 Preview
+ ########################################
+
+
+Filtered DataFrame:
+ timestamp tag_id angle tag_height
+0 1733062840000 4baf351178aa9b0e -30.0 1.2
+1 1733062840100 4baf351178aa9b0e -29.0 1.2
+2 1733062840200 4baf351178aa9b0e -30.0 1.2
+3 1733062840300 4baf351178aa9b0e -29.0 1.2
+4 1733062840400 4baf351178aa9b0e -28.0 1.2
+##############################################################################################################################
+Check of the Length:
+Input csv DF: 42
+Output csv DF: 42
+
+Success Criteria: For a given known input, the output must match the expected calculations.
+
+_________________________________________
+TC 3: Final Output Generation Test
+_________________________________________
+
+TASK: Ensure that the output.csv file is generated correctly and contains valid data.
+
+Success Criterion: The output.csv file should be populated with the filtered data
+without any formatting errors. This test can be simply
+automated using dataframes and then casting the dataframe to a
+csv so there is no need to worry about it
+
+_________________________________________
+TC 4: Cleanup and Termination Test
+_________________________________________
+
+TASK: Ensure that, at the end of the execution, the processes are properly terminated and that the named pipes are deleted.
+
+Success Criterion: After the execution of pipeline.py, the processes should terminate and the FIFO files should be removed or the files should be deleted.
+
+(Garbage collector logic in Java)
+
+_________________________________________
+TC 5: Robustness Testing with Bad Inputs [not managed!]
+_________________________________________
+
+TASK: Check that the system correctly handles bad or incorrectly formatted inputs.
+
+Success Criterion: The system should ignore bad rows and continue processing without interruption.
+
+_________________________________________
+TC 6: Performance Testing
+_________________________________________
+
+TASK: Evaluate the processing time for a large dataset.
+
+Success Criterion: The system should process and a large input file within a reasonable time without crashing
+and a not well solution could be the chuncks-subdivision of the input.csv.
+
+_________________________________________
+TC 7: Concurrency Testing
+_________________________________________
+
+TASK: Check the behavior of the system under multiple simultaneous inputs.
+
+Success Criterion: The system must continue to run without deadlocks or data loss.
+
+_________________________________________
+Example of Automated Test for CASE 3
+_________________________________________
+
+Test: Output Verification for a Test Case
+
+Objective: Automate a test that verifies that the generated output matches the expected output for a known input.
+
+Method:
+
+1. Create an input_test.csv file with known data, and you have that.
+2. Run pipeline.py with input_test.csv.
+3. Compare the generated output.csv to a reference file that you can create, but don't have now.
+4. Success Criteria: The generated output must be identical to the expected file because this proves that the system is working correctly.
+
+
+
+## How to Run the global system
 
 ### 1. Compilation
 
