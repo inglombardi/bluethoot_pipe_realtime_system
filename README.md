@@ -1,6 +1,11 @@
 # bluethoot_pipe_realtime_system
 READ THE LICENCE TO AVOID LEGAL PROBLEM
 
+Request to me to share this project. 
+
+
+
+
 Author
 Nicola Lombardi, SW HW Engineer
 Computer Engineer & Senior Python Dev.
@@ -142,4 +147,67 @@ SOLID Principles are not mandatory in this application
 
 # Cleanup
 Temporary files and named pipes are automatically removed by pipeline.py and run_all.sh.
+
+
+
+# Linux pills
+
+The typical C compiler in Linux system is gcc (GNU C Compiler)
+
+Syntax to build a binary executable
+ $ gcc-o <exec_name> <source_code>.c
+
+Syntax to produce object code
+ $ gcc-c <source_code>.c
+ the output file is named <source_code>.o
+
+Syntax to both build a binary executable and run it:
+$ gcc <source_code>.c -o exe_name && ./exe_name
+
+Syntax to install python:
+$ sudo apt install python3-pip
+
+Syntax to discover python version
+$ python3 --version
+
+Syntax to install gcc:
+$ sudo apt update && sudo apt install build-essential
+
+Syntax to install pandas:
+$ sudo apt install python3-pandas
+
+Syntax to run python script on bash (shell):
+$ python3 pipeline.py
+
+Syntax to know the state of WSL (e.g. Docker) on Windows PowerShell:
+> wsl -l -v
+
+
+## Particular case: aoa_to_1d.c  contains math.h (see below)
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <math.h>
+
+
+Including  library  functions into  a program
+gcc-o <exec> <source>.c -L<dir> -l<name>
+
+The -l options is used to tell the compiler that  some functions in the source code have their 
+object code in the lib<name>.a
+ 
+the library is not in a standard directory, the directory must be specified through the  -L <dir>
+option.
+
+Standard libraries are part of the Operating System, while other 
+libraries are distributed with the compiler; libcis the default C library containing input and output functions 
+such as printf, scanf, open, read, write, etc.
+
+Indeed, at first glance the syntax:
+
+gcc -o aoa_to_1d aoa_to_1d.c
+
+should be sufficient to correctly compile the file aoa_to_1d.c. However, in this case, it is necessary to add the -lm flag to link the math library (libm), and here is why "  gcc -o aoa_to_1d aoa_to_1d.c -lm  " is correct and mandatory!
+
 
