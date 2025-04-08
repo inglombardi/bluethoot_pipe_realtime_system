@@ -347,14 +347,14 @@ FILE *fileptr; //pointer to the file
 
 This procedure is identical whether you use a file or a pipe.
 
-✅ Script 2: aoa_to_1d.c
-📌 Features: It uses named pipes (FIFO), i.e. special files in the filesystem.
+==> Script 2: aoa_to_1d.c <==
+--Features: It uses named pipes (FIFO), i.e. special files in the filesystem.
 
 The program takes the names of the pipes as command line arguments.
 
 It communicates between separate processes (not necessarily parent-child) via FIFO files created before running the script.
 
-🔍 How it works:
+--How it works:
 
 FILE *input_fp = fopen(input_pipe, "r");
 FILE *output_fp = fopen(output_pipe, "w");
@@ -368,18 +368,18 @@ The process reads from one pipe (input_pipe) and writes the processing to anothe
 
 There is no fork() in the code → the processes involved are launched separately but communicate with each other via these special files.
 
-🧠 Key concept:
+==> Key concept:
 Persistent inter-process communication, based on FIFO files in the filesystem.
 
-✅ Script 1: pipe.c
-📌 Features:
+==> Script 1: pipe.c <==
+--Features:
 Uses unnamed pipes, i.e. anonymous pipes created with pipe(fd_pipe).
 
 It works internally between a parent process and its child process created with fork().
 
 It is all autonomous, no files in the filesystem.
 
-🔍 How it works:
+--How it works:
 
 pipe(fd_pipe);
 fork();
@@ -390,10 +390,10 @@ Father reads from pipe (fd_pipe[0])
 
 Data (integer plus 5) is passed directly into shared memory via pipe.
 
-🧠 Key concept:
+--Key concept:
 Parent-child communication based on anonymous pipes in RAM. It is temporary and limited to the lifetime of the process.
 
-🔄 Differences summary:
+## Differences summary:
 Feature                        aoa_to_1d.c   (2)            pipe.c  (1)
 Pipe type                      Named pipe (FIFO)             Unnamed pipe (anonymous pipe)
 Communication                  between separate processes    Parent process ↔ child (fork)
