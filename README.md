@@ -337,10 +337,24 @@ SOLID Principles are not mandatory in this application
 Temporary files and named pipes are automatically removed by pipeline.py and run_all.sh.
 
 
+# Summary of the Processes (High level sorting)
+
+--- High
+# BASH: run_all.sh ----------> the automation of the whole process
+# Python: test_pipe.py ------> the implementation of the test plan for pipeline.py
+# Python: pipeline.py -------> the real "main"
+# Python: median_filter.py --> Preprocessing phaese #2
+# C    : aoa_to_1d.c --> Preprocessing phase #1
+--- Low
+
 
 # Linux pills
 
-The typical C compiler in Linux system is gcc (GNU C Compiler)
+The typical C compiler in Linux system is gcc (GNU C Compiler).
+
+Syntax to reach /mnt:
+cd /mnt/c/Users/....../AAA_Tool_development_workspace/Routing  (in my case)
+
 
 Syntax to build a binary executable
  $ gcc-o <exec_name> <source_code>.c
@@ -355,6 +369,10 @@ $ gcc <source_code>.c -o exe_name && ./exe_name
 Syntax to install python:
 $ sudo apt install python3-pip
 
+Syntax to see it:
+which python3
+(you should see /usr/bin/python3)
+
 Syntax to discover python version
 $ python3 --version
 
@@ -363,6 +381,17 @@ $ sudo apt update && sudo apt install build-essential
 
 Syntax to install pandas:
 $ sudo apt install python3-pandas
+
+Syntax to check the pandas version:
+python3 -c "import pandas; print(pandas.__version__)"
+
+Syntax to verify process running:
+ps aux | grep aoa_to_1d
+ps aux | grep python3
+
+You can see the list of all active processes in your machine using
+ ps-el
+
 
 Syntax to run python script on bash (shell):
 $ python3 pipeline.py
@@ -413,7 +442,26 @@ FILE *fileptr; //pointer to the file
 This procedure is identical whether you use a file or a pipe.
 
 
-(1) Example of pipe:
+(1) Example of pipe: When a process opens a file, a non-negative integer is returned, 
+called file descriptor.  I/O redirection allows writing a program where data are read from 
+stdinand written on stdout
+ During program execution it is possible to duplicate the file 
+descriptor used to refer to an open file so that a standard file 
+descriptor can also be used to refer to that file.
+ By closing the files associated to the standard file descriptors 
+0(stdin)
+ 1(stdout)
+ 2(stderr)
+ and then calling dup, it is possible to use 0, 1, or 2 to access the file 
+whose descriptor is passed to dup
+
+
+
+----------------------------------------------------------
+unnamed pipes: allow interprocess communication between 
+processes in a parent-child relationship
+----------------------------------------------------------
+
 
 #include <stdio.h>
 #include <unistd.h>
@@ -470,6 +518,14 @@ fd_pipe_p2c[1]--->write-------------------------------------------------->
 
 
 (2) Another example of pipe: my script oao_to_1d.c
+
+
+
+----------------------------------------------------------
+named pipes: allow interprocess communication between any pair 
+of unrelated processes (aoa_to_1d.c <--> median_filter.py)
+----------------------------------------------------------
+
 
 #include <stdio.h>
 #include <stdlib.h>
