@@ -1,18 +1,19 @@
 # bluethoot_pipe_realtime_system
 READ THE LICENCE TO AVOID LEGAL PROBLEM
 
-Request to me to share this project. 
+____________________________________
+Request to me to share this project.
+____________________________________
 
 
 
 
-Author
-Nicola Lombardi, SW HW Engineer
-Computer Engineer & Senior Python Dev.
-February 2025
+Author Nicola Lombardi, SW HW Engineer
+Computer and Telecommunications Engineer & Senior Python Dev.
+DATE: February 2025
 
 
-# Real-Time 1D Position Tracking Using Named Pipes
+# [1] CONTEXT: Real-Time 1D Position Tracking Using Named Pipes in a Bluethoot LOW ENERGY Scenario with different cows.
 
 ## Project Description
 
@@ -70,7 +71,7 @@ Implement at least one automated test.
 
 
 
-## Static Components
+# [2] Static Components (Software Module) and Matrix of Software Requirements
 
 | File | Description |
 |-------------------------|----------------------------------------------------------------------------------------------------------------|
@@ -85,14 +86,14 @@ Implement at least one automated test.
 
 
 
-## Input Format
+## [2.1] Input Format
 
 Each row in `input.csv` contains a timestamped angle measurement:
 
 timestamp,tag_id,angle,tag_height 1733062840000,4baf351178aa9b0e,-30,1.2
 
 
-# TEST PLAN 
+# [3] TEST PLAN 
 
 __________
 Test phase
@@ -244,7 +245,7 @@ Method:
 
 
 
-## How to Run the global system
+# [4] How to Run the global system
 
 ### 1. Compilation
 
@@ -313,7 +314,7 @@ Or run the full automation: bash
     ↓
 [output.csv]
 
-# Assumptions
+# [5] Assumptions
 1. The system runs on Linux or WSL, with FIFO support.
 
 2. CSV inputs are assumed to be mostly well-formed.
@@ -324,7 +325,7 @@ Or run the full automation: bash
 
 5. The pipeline is linear and sequential, but concurrency is tested in parallel scenarios.
 
-# Requirements
+# [6] Requirements: Technologies
 Skills in Named Pipe both in C and Python
 Python 3.7 or higher in PyCharm Community Edition
 GCC (to compile the C source)
@@ -337,7 +338,7 @@ SOLID Principles are not mandatory in this application
 Temporary files and named pipes are automatically removed by pipeline.py and run_all.sh.
 
 
-# Summary of the Processes (High level sorting)
+# [7] Summary of the Processes (High level sorting)
 
 --- High
 # BASH: run_all.sh ----------> the automation of the whole process
@@ -348,13 +349,14 @@ Temporary files and named pipes are automatically removed by pipeline.py and run
 --- Low
 
 
-# Linux pills
+# [8] APPENDIX: Linux pills
 
 The typical C compiler in Linux system is gcc (GNU C Compiler).
 
 Syntax to reach /mnt:
 cd /mnt/c/Users/....../AAA_Tool_development_workspace/Routing  (in my case)
 
+### [8.1] C language pills...
 
 Syntax to build a binary executable
  $ gcc-o <exec_name> <source_code>.c
@@ -366,6 +368,14 @@ Syntax to produce object code
 Syntax to both build a binary executable and run it:
 $ gcc <source_code>.c -o exe_name && ./exe_name
 
+Syntax to install gcc:
+$ sudo apt update && sudo apt install build-essential
+
+
+
+
+### [8.2] Python language pills...
+
 Syntax to install python:
 $ sudo apt install python3-pip
 
@@ -376,8 +386,11 @@ which python3
 Syntax to discover python version
 $ python3 --version
 
-Syntax to install gcc:
-$ sudo apt update && sudo apt install build-essential
+Syntax to upgrade the pip, e.g. if  new release of pip is available: 23.2.1 -> 25.0.1
+$ python.exe -m pip install --upgrade pip
+
+Syntax to upgrade the library used in this project:
+$ pip install -r requirements.txt
 
 Syntax to install pandas:
 $ sudo apt install python3-pandas
@@ -392,7 +405,6 @@ ps aux | grep python3
 You can see the list of all active processes in your machine using
  ps-el
 
-
 Syntax to run python script on bash (shell):
 $ python3 pipeline.py
 
@@ -400,7 +412,7 @@ Syntax to know the state of WSL (e.g. Docker) on Windows PowerShell:
 > wsl -l -v
 
 
-## Particular case: aoa_to_1d.c  contains math.h (see below)
+### [8.3] C language syntax pills - Particular case: aoa_to_1d.c  contains math.h (see below)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -429,7 +441,7 @@ should be sufficient to correctly compile the file aoa_to_1d.c. However, in this
 
 
 
-## C language pills
+# [9] APPENDIX C language: PIPES
 
 In C, you can operate on files only in terms of sequences
 of bytes: stream
