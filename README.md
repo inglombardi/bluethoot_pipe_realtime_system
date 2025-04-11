@@ -1,4 +1,4 @@
-# bluethoot_pipe_realtime_system
+# Bluethoot_pipe_realtime_system creation, management, optimization and discussion by Nicola Lombardi
 READ THE LICENCE TO AVOID LEGAL PROBLEM
 
 ____________________________________
