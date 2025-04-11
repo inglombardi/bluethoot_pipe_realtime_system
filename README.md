@@ -341,11 +341,11 @@ Temporary files and named pipes are automatically removed by pipeline.py and run
 # [7] Summary of the Processes (High level sorting)
 
 --- High
-# BASH: run_all.sh ----------> the automation of the whole process
-# Python: test_pipe.py ------> the implementation of the test plan for pipeline.py
-# Python: pipeline.py -------> the real "main"
-# Python: median_filter.py --> Preprocessing phaese #2
-# C    : aoa_to_1d.c --> Preprocessing phase #1
+### BASH: run_all.sh ----------> the automation of the whole process
+### Python: test_pipe.py ------> the implementation of the test plan for pipeline.py
+### Python: pipeline.py -------> the real "main"
+### Python: median_filter.py --> Preprocessing phase #2
+### C    : aoa_to_1d.c --> Preprocessing phase #1
 --- Low
 
 
