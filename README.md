@@ -107,7 +107,11 @@ Implement at least one automated test.
 
 Each row in `input.csv` contains a timestamped angle measurement:
 
-timestamp,tag_id,angle,tag_height 1733062840000,4baf351178aa9b0e,-30,1.2
+_________________________________________________________________________________
+timestamp [seconds],     tag_id [string],        angle [deg.] , tag_height [m] 
+1733062840000      ,4baf351178aa9b0e               ,-30 ,  1.2
+_________________________________________________________________________________
+
 
 
 # [3] TEST PLAN 
