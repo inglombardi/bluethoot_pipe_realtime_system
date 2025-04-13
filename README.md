@@ -11,59 +11,76 @@ ____________________________________
 Author Nicola Lombardi, SW HW Engineer
 Computer and Telecommunications Engineer & Senior Python Dev.
 DATE: February 2025
+NAME OF THE PROJECT: REAL TIME BLE TRACKER SYSTEM
 
 
-# [1] CONTEXT: Real-Time 1D Position Tracking Using Named Pipes in a Bluethoot LOW ENERGY Scenario with different cows.
+# [1] CONTEXT of the PROJECT : Real-Time 1D Position Tracking Using Named Pipes in a Bluethoot LOW ENERGY Scenario with different cows.
+
+A company request me to design an **automated system** with innovation and a scalable approach.
+The high **UHF** band contains ISM band [ particular sub-band centered on 2.4 GHz] and has similar characteristics to the medium UHF band, but allows a further reduction in the size of the antenna and therefore of the Tag (due to the link between the size of the antenna and the wavelength). However, it is a band very crowded with other technologies (Wi-Fi, Bluetooth, ZigBee).
+The specific frequency taken into consideration for the simulations is 2.45 GHz, and it is the central one for the ISM band that goes from 2.4 GHz to 2.5 GHz. The acronym ISM stands for “Industrial, Scientific and Medical” and refers to the type of applications that work in that specific spectrum with limitations regarding power and use only in non-public places: some examples of applications in the industrial field can be heaters, by induction or microwave for the treatment of plastic material. In the medical field, however, there are devices for the transfer of heat inside tissues, both with the aim of regenerating them from trauma (Tecar) and to try to eliminate cancer cells. There are also other applications, which however do not fall within the literal definition of ISM, such as for example Bluetooth, NFC, RFID, WiFi; the latter are all low-power, short-range and therefore usable without a license, but still operate within the band between 2.4 GHz and 2.5 GHz. From an ethical point of view, considering for example the medical field, for a patient to own a bone implant can be seen as discrimination, as he is denied the possibility of benefiting from a treatment, perhaps the only possible one, just because of a foreign body.
 
 ## Project Description
 
-This project implements a real-time data processing pipeline to track the 1D position of a cow equipped with a Bluetooth tag. The pipeline connects multiple components via **Linux named pipes (FIFOs)** and manages the flow of data from raw measurements to a filtered output.
+This project implements a "real-time data processing pipeline" to track (TRACKER SYSTEM) the 1D position of a cow equipped with a Bluetooth tag. The pipeline connects multiple components via **Linux named pipes (FIFOs)** and manages the flow of data from raw measurements to a filtered output.
 
 The cow transmits Bluetooth packets through a tag; a fixed anchor receives these transmissions and computes their **Angle of Arrival (AoA)**. By knowing both the anchor's and tag's height, and after applying filtering to smooth the data, the system computes the 1D position of the cow in real time.
 
+______________________________________
 The workflow is composed by 5 phases:
-1. Creates Linux named pipes, to facilitate communication between the 
+______________________________________
+
+1. **CREATION PHASE** - Creates Linux named pipes, to facilitate communication between the 
 components. 
-2. Starts the Preprocessing with aoa_to_1d and median_filter.py processes, ensuring they read 
+2. **PREPROCESSING PHASE** - Starts the Preprocessing with aoa_to_1d and median_filter.py processes, ensuring they read 
 from and write to the correct pipes.
 aoa_to_1d.c receives pipes from Python script (pipeline.py) that is the called by test_pipe.
 
-aoa_to_1d: A C program that converts the angle to a 1D position.
+**==>** aoa_to_1d: A C program that converts the angle to a 1D position.
 
-median_filter.py: A Python script that filters the data using the median.
+**==>** median_filter.py: A Python script that filters the data using the median.
 
-4. Reads input data from input.csv, writes it to the aoa_to_1d input pipe, and 
+3. **I / O PHASE** - Reads input data from input.csv, writes it to the aoa_to_1d input pipe, and 
 ensures the process is properly notified when input is finished. 
-5. Reads the final filtered output from median_filter.py and writes it to an 
+4. **POSTPROCESSING PHASE** Reads the final filtered output from median_filter.py and writes it to an 
 output CSV file (output.csv). 
-6. Handles process cleanup and removes the named pipes after execution.
+5. **FLUSH PHASE** - Handles process cleanup and removes the named pipes after execution.
 
 
 ## Work planning to follow (not the runtime but the code writing before testing)
 
+________________________________________
 1. Creating named pipes (FIFO)  [Python]
+________________________________________
 
 Create 2 pipes: one for aoa_to_1d and one for median_filter.py.
 
+________________________________________
 2. Starting processes with Python
+________________________________________
 Compile and run aoa_to_1d. [C language with GCC using Ubuntu shell with WSL]
 
 Start median_filter.py with its parameters.
-
+________________________________________
 3. Data flow management
+________________________________________
 
 Read data from input.csv.
 Write it to the aoa_to_1d pipe.
 Read the output of aoa_to_1d and pass it to the median_filter.py pipe.
 Write the final result to output.csv.
 
+________________________________________
 4. Shutdown and cleanup
+________________________________________
+
 
 Shut down all files and processes.
 
 Delete named pipes.
-
+________________________________________
 5. Test
+________________________________________
 
 Write a test plan with several cases to cover.
 Implement at least one automated test.
