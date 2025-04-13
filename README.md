@@ -29,6 +29,57 @@ which acts as a Bluetooth beacon, broadcasting packets; a Bluetooth anchor is  m
 
 The cow transmits Bluetooth packets through a tag; a fixed anchor receives these transmissions and computes their **Angle of Arrival (AoA)**. By knowing both the anchor's and tag's height, and after applying filtering to smooth the data, the system computes the 1D position of the cow in real time.
 
+
+## Project Analysis and Specifications
+The primary goal of this project is to develop a real-time position tracking system for livestock (specifically cows) using Bluetooth Low Energy (BLE) technology. The system is designed to estimate the 1D position of a tagged cow by computing the Angle of Arrival (AoA) of BLE signals. This estimation is refined using signal preprocessing and filtering techniques. The project architecture prioritizes scalability, low-latency, and modularity, and is implemented using a hybrid software stack: C for real-time signal transformation and Python for data orchestration and filtering.
+
+The overall system is designed to be automated, maintainable, and easily testable, with a strong emphasis on data integrity and inter-process communication (IPC) via Linux named pipes (FIFOs).
+
+The architecture supports horizontal scaling, where additional anchors and tag IDs can be added with minimal code changes. The use of named pipes ensures modularity, making it easy to plug in additional filters or transform stages. This design anticipates integration into edge computing platforms or cloud-streaming pipelines with real-time analytics.
+
+The system assumes a Linux-based environment (native or via WSL).
+
+Input data is expected to be mostly well-formed; malformed lines are ignored without crashing.
+
+The AoA → 1D mapping relies on fixed anchor height and BLE tag height.
+
+Real-time behavior is emulated using CSV input streams but designed for hardware integration.
+
+The project does not strictly follow SOLID or OOP patterns due to the procedural nature of the real-time processing.
+
+The system MUST includes:
+
+1. Error handling for missing or malformed input data.
+
+2. Automated cleanup of temporary files and processes.
+
+3. A comprehensive test suite with test cases covering: Named pipe creation, Data integrity across pipes, Output correctness, Performance on large datasets, Robustness under malformed or concurrent input scenarios
+
+
+
+## Data Source
+
+input.csv : input samples of the Data Processor ---> Not Available (NDA)
+output.csv : output filtered samples of the Data Processor ---> Not Available (NDA)
+expected_output.csv : expected output samples of the Data Processor ---> Not Available (NDA)
+
+## Acronym
+NDA = Non Disclosure Agreement 
+BLE = Bluethoot Low Energy
+TC = Test Case
+
+
+# [2] My PROJECT IMPLEMENTATION: Global Solution
+In this README.md I show a global solution of SOFTWARE DESIGN AND TESTING FOR QUALITY ASSURANCE with:
+
+1. workflow in a Single Responsibility Principle Overview (for each phase) (see section #2, this section)
+2. technologies chosen for this project  (see section #3)
+3. software modules and coupling architecture (dependency) (see section #7)
+4. Test plan and test cases to test this global system (see section #4)
+5. Comment about source code (NOT OPEN SOURCE, but you must request me to share it)  (see section #5, #6, #7 and #8)
+6. Pills about Linux and Programming languages  (see section #9 and #10)
+
+
 ______________________________________
 The workflow is composed by 5 phases:
 ______________________________________
@@ -40,8 +91,11 @@ from and write to the correct pipes.
 aoa_to_1d.c receives pipes from Python script (pipeline.py) that is the called by test_pipe.
 
 **==>** aoa_to_1d: A C program that converts the angle to a 1D position.
+Note that: you must see the document --->  pandas_insight/README__median_filter_algorithm.pdf
 
 **==>** median_filter.py: A Python script that filters the data using the median.
+Note that: you must see the document --->  pandas_insight/README__median_filter_algorithm.pdf
+
 
 3. **I / O PHASE** - Reads input data from input.csv, writes it to the aoa_to_1d input pipe, and 
 ensures the process is properly notified when input is finished. 
@@ -91,7 +145,7 @@ Implement at least one automated test.
 
 
 
-# [2] Static Components (Software Module) and Matrix of Software Requirements
+# [3] Static Components (Software Module) and Matrix of Software Requirements
 
 | File | Description |
 |-------------------------|----------------------------------------------------------------------------------------------------------------|
@@ -106,7 +160,7 @@ Implement at least one automated test.
 
 
 
-## [2.1] Input Format
+## [3.1] Input Format
 
 Each row in `input.csv` contains a timestamped angle measurement:
 
@@ -117,7 +171,7 @@ ________________________________________________________________________________
 
 
 
-# [3] TEST PLAN 
+# [4] TEST PLAN 
 
 __________
 Test phase
@@ -269,7 +323,7 @@ Method:
 
 
 
-# [4] How to Run the global system
+# [5] How to Run the global system
 
 ### 1. Compilation
 
@@ -338,7 +392,7 @@ Or run the full automation: bash
     ↓
 [output.csv]
 
-# [5] Assumptions
+# [6] Assumptions
 1. The system runs on Linux or WSL, with FIFO support.
 
 2. CSV inputs are assumed to be mostly well-formed.
@@ -349,7 +403,7 @@ Or run the full automation: bash
 
 5. The pipeline is linear and sequential, but concurrency is tested in parallel scenarios.
 
-# [6] Requirements: Technologies
+# [7] Requirements: Technologies
 Skills in Named Pipe both in C and Python
 Python 3.7 or higher in PyCharm Community Edition
 GCC (to compile the C source)
@@ -362,7 +416,7 @@ SOLID Principles are not mandatory in this application
 Temporary files and named pipes are automatically removed by pipeline.py and run_all.sh.
 
 
-# [7] Summary of the Processes (High level sorting)
+# [8] Summary of the Processes (High level sorting)
 
 --- High
 ### BASH: run_all.sh ----------> the automation of the whole process
@@ -373,14 +427,14 @@ Temporary files and named pipes are automatically removed by pipeline.py and run
 --- Low
 
 
-# [8] APPENDIX: Linux pills
+# [9] APPENDIX: Linux pills
 
 The typical C compiler in Linux system is gcc (GNU C Compiler).
 
 Syntax to reach /mnt:
 cd /mnt/c/Users/....../AAA_Tool_development_workspace/Routing  (in my case)
 
-### [8.1] C language pills...
+### [9.1] C language pills...
 
 Syntax to build a binary executable
  $ gcc-o <exec_name> <source_code>.c
@@ -428,7 +482,7 @@ contained in the buffer
 
 
 
-### [8.2] Python language pills...
+### [9.2] Python language pills...
 
 Syntax to install python:
 $ sudo apt install python3-pip
@@ -466,7 +520,7 @@ Syntax to know the state of WSL (e.g. Docker) on Windows PowerShell:
 > wsl -l -v
 
 
-### [8.3] C language syntax pills - Particular case: aoa_to_1d.c  contains math.h (see below)
+### [9.3] C language syntax pills - Particular case: aoa_to_1d.c  contains math.h (see below)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -495,7 +549,7 @@ should be sufficient to correctly compile the file aoa_to_1d.c. However, in this
 
 
 
-# [9] APPENDIX C language: PIPES
+# [10] APPENDIX C language: PIPES
 
 In C, you can operate on files only in terms of sequences
 of bytes: stream
