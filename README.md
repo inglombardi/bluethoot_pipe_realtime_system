@@ -24,6 +24,9 @@ The specific frequency taken into consideration for the simulations is 2.45 GHz,
 
 This project implements a "real-time data processing pipeline" to track (TRACKER SYSTEM) the 1D position of a cow equipped with a Bluetooth tag. The pipeline connects multiple components via **Linux named pipes (FIFOs)** and manages the flow of data from raw measurements to a filtered output.
 
+The underlying application is the real-time tracking of a cow’s position, in one dimension only: the cow is wearing a Bluetooth tag (yellow tag in the picture below) 
+which acts as a Bluetooth beacon, broadcasting packets; a Bluetooth anchor is  mounted in a fixed position and it computes the angle of arrival α for each Bluetooth transmission from the tag.
+
 The cow transmits Bluetooth packets through a tag; a fixed anchor receives these transmissions and computes their **Angle of Arrival (AoA)**. By knowing both the anchor's and tag's height, and after applying filtering to smooth the data, the system computes the 1D position of the cow in real time.
 
 ______________________________________
@@ -392,6 +395,36 @@ $ gcc <source_code>.c -o exe_name && ./exe_name
 Syntax to install gcc:
 $ sudo apt update && sudo apt install build-essential
 
+
+### atof()
+The atof() function converts a C-style string, passed as an argument to atol() function, to double. 
+It converts the C-string str to a value of type double by interpreting the characters of the string as numerical values. It discards the leading whitespace characters until a non-whitespace character is found.
+
+### fopen() and fclose()
+fopen() and fclose() : similar to
+open() and close() Linux C language system calls but interact with files and allow you to act in a "formatted" way
+
+
+### fscanf() and fprintf()
+fprintf() and fscanf() : similar to
+printf() and scanf() but interact with files and allow you to act in a "formatted" way
+
+
+
+### fgets() and fflush()
+
+fgets() and stdin: the fgets() function can therefore be used to read a line from the keyboard (overcoming the limits of the input from the file to the keyboard (stdin).
+
+s=fgets(vector,DIM,fileptr);
+s -> vector address
+vector -> vector that will contain the read line
+DIM -> vector size
+fileptr -> pointer to the file to read
+The fgets() function adds the character \0
+end of string to the end of the line
+
+fflush(fileptr): flushes to disk all the writings
+contained in the buffer
 
 
 
