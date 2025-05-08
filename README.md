@@ -434,6 +434,53 @@ The typical C compiler in Linux system is gcc (GNU C Compiler).
 Syntax to reach /mnt:
 cd /mnt/c/Users/....../AAA_Tool_development_workspace/Routing  (in my case)
 
+However remember that each path in Windows is mapped in Ubuntu (WSL) in this way:
+
+C:\Users\...\PycharmProjects   ==> WINDOWS
+
+/mnt/c/Users/.../PycharmProjects/ ==> WSL (Ubuntu)
+
+In alternative you can create a Virtual Environment using PyCharm (venv) or WSL shell:
+nicola@LAPTOP:~$ python3 -m venv nome_env
+nicola@LAPTOP:~$ source nome_env/bin/activate
+
+Using Bash Programming you can use:
+cmd.exe /c start notepad.exe
+++++++++++++++++++++++++++++++++
+Linux CMD    |	Effects
+++++++++++++++++++++++++++++++++	
+**ifconfig**     |	Display network configuration information
+**ip addr show ** |	Both show the type of interface, protocols, hardware and IP addresses, network masks and various other information about each of the active interfaces on the system.
+**route ** |	To view a table that describes where network packages are sent. Other numeric version with "route -n" or "ip route show". 
+**ping**   |	determine if another machine is reachable
+**netstat**|  display information about network connections as well as display the routing table similar to the route command
+**netstat** -i  |	display statistics regarding network traffic
+**netstat** -r  |	routing information
+**netstat** -tln |	-t stands for TCP (recall this protocol from earlier in this chapter), -l stands for listening (which ports are listening) and -n stands for show numbers, not names.
+**ss**  |	show socket statistics and supports all the major packet and socket types. Meant to be a replacement for and to be similar in function to the netstat command, it also shows a lot more information and has more features.
+**dig**	  |  performs queries on the DNS server to determine if the information needed is available on the server ( resolve the IP address  )
+**host**  |	requires to DNS server to giv e back the IP from the <host, IP> association tuple
+**ssh**   |	"connect to another machine across the network, log in and then perform tasks on the remote machine.
+
+If you only provide a machine name or IP address to log into, the ssh command assumes you want to log in using the same username that you are currently logged in as."
+grep 127.0.0.1 /etc/hosts	Verify that the IP address 127.0.0.1 has an entry in the /etc/hosts file
+ping -c4 localhost	Send only 4 pkts
+netstat --help	how you can read documentation
+start_webserver	Use it followed by "ss" ti display network statistics
+service network restart	the networking for the system is stopped and then started back up.
+
+
+**jobs**  |	verify running processes
+ping localhost > /dev/null &	Using ps -o pid,tty,time,%cpu,cmd the command shows information
+**top**	View the processes data structure with information such as PID, User, resource, %CPU, %MEM, timestamp, commands
+**sleep**	choose the PID of the process which you want to asleep
+**free**	command outputs statistics about
+ls /var/log	where to see logs
+
+
+
+
+
 ### [9.1] C language pills...
 
 Syntax to build a binary executable
@@ -765,6 +812,21 @@ Pipe creation                  Externally with mkfifo        Internally with pip
 I/O mechanism                  fopen(), fprintf(), fgets()   read(), write()
 
 Persistence Can persist in filesystem, Temporary, exists only in RAM
+
+
+
+# [11] Bibliography and Sitography
+
+1) Kaggle for Pandas
+2) GitHub
+3) Cisco Academy: Linux Essentials (my badge to https://www.credly.com/badges/7eaeeba1-b530-4d8b-a5b9-933588064a8c)
+4) Edutecnica https://www.edutecnica.it/informatica
+5) Learn C++ – Skill up with our free tutorials
+6) RFId: https://www.researchgate.net/publication/375717478_Wireless_Systems_-_Progettazione_di_un'antenna_su_tessuto_per_Wireless_Local_Area_Network
+
+   
+
+
 
 
 
