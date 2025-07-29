@@ -17,6 +17,10 @@ NAME OF THE PROJECT: REAL TIME BLE TRACKER SYSTEM
 # [1] CONTEXT of the PROJECT : Real-Time 1D Position Tracking Using Named Pipes in a Bluethoot LOW ENERGY Scenario with different cows.
 
 A company request me to design an **automated system** with innovation and a scalable approach.
+
+Here is shown only a **DEMO** of my software but it's not OPEN source.
+
+
 The high **UHF** band contains ISM band [ particular sub-band centered on 2.4 GHz] and has similar characteristics to the medium UHF band, but allows a further reduction in the size of the antenna and therefore of the Tag (due to the link between the size of the antenna and the wavelength). However, it is a band very crowded with other technologies (Wi-Fi, Bluetooth, ZigBee).
 The specific frequency taken into consideration for the simulations is 2.45 GHz, and it is the central one for the ISM band that goes from 2.4 GHz to 2.5 GHz. The acronym ISM stands for “Industrial, Scientific and Medical” and refers to the type of applications that work in that specific spectrum with limitations regarding power and use only in non-public places: some examples of applications in the industrial field can be heaters, by induction or microwave for the treatment of plastic material. In the medical field, however, there are devices for the transfer of heat inside tissues, both with the aim of regenerating them from trauma (Tecar) and to try to eliminate cancer cells. There are also other applications, which however do not fall within the literal definition of ISM, such as for example Bluetooth, NFC, RFID, WiFi; the latter are all low-power, short-range and therefore usable without a license, but still operate within the band between 2.4 GHz and 2.5 GHz. From an ethical point of view, considering for example the medical field, for a patient to own a bone implant can be seen as discrimination, as he is denied the possibility of benefiting from a treatment, perhaps the only possible one, just because of a foreign body.
 
@@ -28,6 +32,22 @@ The underlying application is the real-time tracking of a cow’s position, in o
 which acts as a Bluetooth beacon, broadcasting packets; a Bluetooth anchor is  mounted in a fixed position and it computes the angle of arrival α for each Bluetooth transmission from the tag.
 
 The cow transmits Bluetooth packets through a tag; a fixed anchor receives these transmissions and computes their **Angle of Arrival (AoA)**. By knowing both the anchor's and tag's height, and after applying filtering to smooth the data, the system computes the 1D position of the cow in real time.
+
+
+A system described in this scenario must be able to handle several elements:
+- the storage system must be reliable and fast.
+- the data must be subjected to previously tested and validated data cleaning procedures, since the "Anchor" module could calculate coordinates based on angles that make no sense, for example, with incorrect signs or anomalous values, or abrupt variations that the cow cannot have.
+- the system needs to receive and analyze the data, but cattle are diverse, so coordinates need to be distinguished using an ID tag. Each animal can be equipped with an RFID tag containing a unique identification number.
+- For conversion operations, maximum processing speed is required.
+- For data analysis, a semi-structured data type and an appropriate data cleaning algorithm must be used.
+- Process 1 (P1 - PreProcessing Phase 1) must be coordinated with the communication opening.
+- Process 2 (P2 - PreProcessing Phase 2) must be coordinated with process P1, which will pass the data to it using a data structure that is not a text file or other data structure that increases latency.
+- The system must be controlled by an additional process that creates and tests the pipeline, continuously verifying its correct functioning. All situations in which anomalous behavior occurs must be defined.
+ 
+In order to improve the system, it definetively must have:
+a controller unit that build and test the pipeline in order to follow all test plan phases ==> this implies to write a test_pipe.py
+a stochastic communication protocol ( an adaptive ALOHA collision–arbitration algorithm ) to deal data collisions using solution from literature ==> this implies to modify pipeline.py
+an extended "anchor" module with 3D geometry using real data in x, y and z coordinates --> this implies to modify aoa_to_1d.c
 
 
 ## Project Analysis and Specifications
