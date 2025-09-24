@@ -1,5 +1,17 @@
 # Bluethoot_pipe_realtime_system creation, management, optimization and discussion by Nicola Lombardi
-READ THE LICENCE TO AVOID LEGAL PROBLEM
+# READ THE LICENCE TO AVOID LEGAL PROBLEM: 
+
+# License Notice
+
+This project has been fully developed and authored by Nicola Lombardi.
+No external AI-based tools or code generation assistants (such as OpenAI ChatGPT, GitHub Copilot, BlackBox, or similar technologies) were used in the design, implementation, or documentation of this work.
+
+All source code and related materials were written manually by the author.
+The work was completed in February 2025 and serves as a demonstration of the author’s professional seniority level in C, C++, and Python, specifically for recruiting and evaluation purposes.
+
+Unless otherwise agreed upon in writing with the author, this project is provided for review and demonstration only, without warranty of any kind, and cannot be redistributed or commercialized without explicit permission.
+
+# © 2025 Nicola Lombardi. All rights reserved.
 
 ____________________________________
 Request to me to share this project.
@@ -122,6 +134,108 @@ ensures the process is properly notified when input is finished.
 4. **POSTPROCESSING PHASE** Reads the final filtered output from median_filter.py and writes it to an 
 output CSV file (output.csv). 
 5. **FLUSH PHASE** - Handles process cleanup and removes the named pipes after execution.
+
+## Main processes: called and caller (both .c and .py)
+
+1.  **`aoa_to_1d.c` (C program)**
+
+    -   Converts raw AoA measurements into 1D positions.\
+
+    -   Input: `<timestamp>,<tag_id>,<angle>,<tag_height>`\
+
+    -   Output: `<timestamp>,<tag_id>,<position>` where
+
+            position = (h_anchor - tag_height) * tan(angle)
+
+    -   Requires the anchor height `h_anchor` as a runtime parameter.
+
+2.  **`median_filter.py` (Python script)**
+
+    -   Cleans noisy data by applying a median filter in a **time
+        window**.\
+    -   Input: `<timestamp>,<tag_id>,<position>`\
+    -   Output: `<timestamp>,<tag_id>,<median_position>`
+
+    This ensures smoother, more reliable position estimates.
+
+3.  **`pipeline.py` (Python orchestrator)**
+
+    -   Controls the whole preprocessing chain:
+        -   Creates communication channels (files or FIFOs).
+        -   Compiles and runs `aoa_to_1d.c` both BASH compilation and BASH running with arguments.
+        -   Runs `median_filter.py` with arguments.
+        -   Streams data from `input.csv` to the pipeline.
+        -   Writes the final results into `output.csv`.
+
+------------------------------------------------------------------------
+
+## Workflow
+
+1.  **Data Source**\
+    `input.csv` contains raw samples:
+
+        timestamp,tag_id,angle,tag_height
+
+2.  **Step 1 -- AoA to Position**\
+    `aoa_to_1d.c` reads from the first channel (pipe or file), processes
+    each row, and outputs:
+
+        timestamp,tag_id,position
+
+3.  **Step 2 -- Median Filtering**\
+    `median_filter.py` reads the output of Step 1, applies a median
+    filter within the chosen time window (default: 1000 ms), and
+    produces:
+
+        timestamp,tag_id,median_position
+
+4.  **Step 3 -- Pipeline Orchestration**\
+    `pipeline.py` manages both steps:
+
+    -   Writes `input.csv` → `input_pipe`
+    -   Executes `./aoa_to_1d input_pipe output_pipe_aoa h_anchor`
+    -   Executes
+        `python3 median_filter.py output_pipe_aoa output_pipe_filter`
+    -   Collects the final results into `output.csv`
+
+------------------------------------------------------------------------
+
+## Execution
+
+### 1. Prerequisites
+
+-   WSL or Linux environment
+-   Installed tools:
+    -   `gcc` (to compile C)
+    -   `python3` (with `pandas`)
+
+### 2. Run the pipeline
+
+Simply run:
+
+``` bash
+python3 pipeline.py
+```
+
+The script will: - Compile `aoa_to_1d.c` automatically (producing
+`./aoa_to_1d`). - Execute both preprocessing steps. - Save results in
+`output.csv`.
+
+------------------------------------------------------------------------
+
+## Notes
+
+-   The system supports both **files** and **named pipes (FIFO)**.\
+    On WSL, file mode is preferred (`USE_FILES=True` in `constant.py`)
+    because native FIFOs may cause issues.\
+-   Anchor height (`h_anchor`) is defined in `constant.py` and passed to
+    `aoa_to_1d.c`.\
+-   The pipeline simulates a **data stream** by reading `input.csv` line
+    by line with small delays.
+
+------------------------------------------------------------------------
+
+
 
 
 ## Work planning to follow (not the runtime but the code writing before testing)
