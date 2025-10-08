@@ -81,6 +81,32 @@ PIPE_AOA = "output_pipe_aoa.txt" if USE_FILES else "output_pipe_aoa.fifo"
 PIPE_FILTER = "output_pipe_filter.txt" if USE_FILES else "output_pipe_filter.fifo"
 
 
+def compile_c_program():
+    """
+    Compile aoa_to_1d.c in aoa_to_1d (executable in .exe).
+    if it already exists, it's not a problem
+    """
+    c_file = "aoa_to_1d.c"   # MANDATORY !
+    exe_file = "aoa_to_1d"
+
+    if not os.path.exists(c_file):
+        raise FileNotFoundError(f"File sorgente {c_file} non trovato!")
+
+    logging.info("Compilation MIN GW with gcc command in WSL ...")
+    result = subprocess.run(
+        ["gcc", c_file, "-o", exe_file, "-lm"],
+        capture_output=True,
+        text=True
+    )
+
+    if result.returncode != 0:
+        logging.error(f"Error in  Compilation C:\n{result.stderr}")
+        raise RuntimeError("Compilation failed !")
+    else:
+        logging.info("Compilation SUCCESSFUL")
+
+
+
 def create_file(file_name):
     """ Single Responsibility Principle Function
     (I) Features: Version with files
@@ -157,6 +183,8 @@ def pipeline_called():
     logging.info("[START THE PREPROCESSING]...")
 
     try:
+        compile_c_program()
+
         # Simulate data streaming from input.csv to input_pipe.txt
         # Remember this code does not deal the EXCEL opened exception
         for pipe in [PIPE_INPUT, PIPE_AOA, PIPE_FILTER]:
@@ -171,8 +199,8 @@ def pipeline_called():
         # ---------------------------------------------------------------------------
 
         logging.info("PREPROCESSING PHASE 1 (USE BASH PROGRAMMING SYNTAX)...")
-        aoa_proc = subprocess.Popen(["./aoa_to_1d", PIPE_INPUT,
-                                     PIPE_AOA, h_anchor])
+	    # COUPLING with if (argc != 4) { fprintf(stderr, "Usage: %s <input_pipe> <output_pipe> <h_anchor>\n", argv[0]);
+        aoa_proc = subprocess.Popen(["./aoa_to_1d", PIPE_INPUT, PIPE_AOA, h_anchor])
 
         # Simulation of the WAIT(0)
         # Wait for the first process to finish before proceeding
